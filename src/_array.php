@@ -14,6 +14,14 @@ class ArrayConvert
         return $this;
     }
 
+    private function _cookKey($key)
+    {
+        if ( false !== strpos($key, ':')) {
+            $key = 'xmlns:'.$key;
+        }
+        return $key;
+    }
+
     private function _processProps($arr, $xml)
     {
         if (!isset($arr['@props'])) {
@@ -23,6 +31,7 @@ class ArrayConvert
             return !trigger_error('Props should be array. '.print_r($arr['@props'], true));
         }
         foreach ($arr['@props'] as $k=>$v) {
+            $k = $this->_cookKey($k);
             $xml->addAttribute($k,$v);
         }
     }
@@ -37,16 +46,21 @@ class ArrayConvert
         }
         foreach ($arr['@children'] as $childKey=>$child) {
             if (!is_array($child)) {
-                $xml->addChild($childKey, $child); 
+                $xml->addChild(
+                    $this->_cookKey($childKey),
+                    $child
+                ); 
                 continue;
             }
             if (isset($child['@children']) && !is_array($child['@children'])) {
                 $dom = $xml->addChild(
-                    $child['@name'],
+                    $this->_cookKey($child['@name']),
                     $child['@children']
                 ); 
             } else {
-                $dom = $xml->addChild($child['@name']); 
+                $dom = $xml->addChild(
+                    $this->_cookKey($child['@name'])
+                ); 
             }
             $this->_processOne($child, $dom);
         }

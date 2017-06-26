@@ -108,4 +108,31 @@ class ArrayTest extends PHPUnit_Framework_TestCase
             "\n";
         $this->assertEquals($expected, $actual);
     }
+
+    function testHandleColon()
+    {
+        $arr = [
+            '@name'=>'foo',
+            '@props'=>[
+                'xmlns:bar'=>'http://xxx'
+            ],
+            '@children'=>[
+                [
+                    '@name'=>'bar:bar',
+                    '@children'=> [[
+                        '@name'=>'bar:aaa',
+                        '@children'=>'bbb',
+                    ]]
+                ]
+            ]
+        ];
+        $p = \PMVC\plug($this->_plug);
+        $array = $p->array();
+        $actual = $array->toXml($arr);
+        $expected = '<?xml version="1.0" encoding="utf-8"?>'.
+            "\n".
+            '<foo xmlns:bar="http://xxx"><bar:bar><bar:aaa>bbb</bar:aaa></bar:bar></foo>'.
+            "\n";
+        $this->assertEquals($expected, $actual);
+    }
 }
