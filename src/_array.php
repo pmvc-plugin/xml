@@ -36,6 +36,21 @@ class ArrayConvert
         }
     }
 
+    public function addChild($xml, $k, $v = null)
+    {
+        if (!is_null($v)) {
+            $result = $xml->addChild(
+                $this->_cookKey($k),
+                htmlspecialchars($v)
+            );
+        } else {
+            $result = $xml->addChild(
+                $this->_cookKey($k)
+            );
+        }
+        return $result;
+    }
+
     private function _processChildren($arr, $xml)
     {
         if (!isset($arr['@children'])) {
@@ -46,21 +61,24 @@ class ArrayConvert
         }
         foreach ($arr['@children'] as $childKey=>$child) {
             if (!is_array($child)) {
-                $xml->addChild(
-                    $this->_cookKey($childKey),
+                $this->addChild(
+                    $xml,
+                    $childKey,
                     $child
-                ); 
+                );
                 continue;
             }
             if (isset($child['@children']) && !is_array($child['@children'])) {
-                $dom = $xml->addChild(
-                    $this->_cookKey($child['@name']),
+                $dom = $this->addChild(
+                    $xml,
+                    $child['@name'],
                     $child['@children']
-                ); 
+                );
             } else {
-                $dom = $xml->addChild(
-                    $this->_cookKey($child['@name'])
-                ); 
+                $dom = $this->addChild(
+                    $xml,
+                    $child['@name']
+                );
             }
             $this->_processOne($child, $dom);
         }
