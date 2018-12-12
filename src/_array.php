@@ -139,7 +139,7 @@ class ArrayConvert
         return $xml->asXML();
     }
 
-    public function toHtml($arr, $tag=null)
+    public function toHtml($arr, $tag='div')
     {
       $xml = $this->_toXmlObj($arr, $tag);
       $dom = dom_import_simplexml($xml);
