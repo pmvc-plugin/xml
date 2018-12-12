@@ -51,7 +51,7 @@ class ArrayConvert
         return $result;
     }
 
-    private function _processChildren($arr, $xml)
+    private function _processChildren($arr, $xml, $tag)
     {
         if (!isset($arr['@children'])) {
             return;
@@ -60,6 +60,7 @@ class ArrayConvert
             return;
         }
         foreach ($arr['@children'] as $childKey=>$child) {
+            $child = $this->_reTag($child, $tag, $childKey);
             if (!is_array($child)) {
                 $this->addChild(
                     $xml,
@@ -80,19 +81,42 @@ class ArrayConvert
                     $child['@name']
                 );
             }
-            $this->_processOne($child, $dom);
+            $this->_processOne($child, $dom, $tag);
         }
     }
 
-    private function _processOne($arr, $xml)
+    private function _processOne($arr, $xml, $tag)
     {
+        $arr = $this->_reTag($arr, $tag);
         $this->_processProps($arr, $xml);
-        $this->_processChildren($arr, $xml);
+        $this->_processChildren($arr, $xml, $tag);
     }
 
-    public function toXml($arr)
+    private function _reTag($arr, $tag, $key=null)
+    {
+      if ($tag) {
+        $oldArr = $arr;
+        $oldName = \PMVC\get($arr, '@name', $key);
+        if ($oldName !== $tag) {
+          if (!is_array($arr)) {
+            $arr = [];
+          }
+          if (!isset($arr['@children']) && !isset($arr['@name'])) {
+            $arr['@children'] = $oldArr;
+          }
+          $arr['@name'] = $tag;
+          if (strlen($oldName)) {
+            $arr['@props']['name'] = $oldName;
+          }
+        }
+      }
+      return $arr;
+    }
+
+    private function _toXmlObj($arr, $tag=null)
     {
         $dom = new DOMDocument('1.0', 'utf-8');
+        $arr = $this->_reTag($arr, $tag);
         if (isset($arr['@children']) &&
             !is_array($arr['@children'])) 
         {
@@ -105,8 +129,20 @@ class ArrayConvert
         }
         $dom->appendChild($root);
         $xml = simplexml_import_dom($dom);
-        $this->_processOne($arr, $xml);
+        $this->_processOne($arr, $xml, $tag);
+        return $xml;
+    }
+
+    public function toXml($arr, $tag=null)
+    {
+        $xml = $this->_toXmlObj($arr, $tag);
         return $xml->asXML();
     }
- 
+
+    public function toHtml($arr, $tag=null)
+    {
+      $xml = $this->_toXmlObj($arr, $tag);
+      $dom = dom_import_simplexml($xml);
+      return $dom->ownerDocument->saveXML($dom->ownerDocument->documentElement);
+    } 
 }

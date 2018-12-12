@@ -135,4 +135,17 @@ class ArrayTest extends PHPUnit_Framework_TestCase
             "\n";
         $this->assertEquals($expected, $actual);
     }
+
+    public function testToHtml()
+    {
+        $arr = [
+          'lev1' => [
+            'lev2' => ['a', 'b', 'c'],
+            'lev3' => 'text'
+          ]
+        ];
+        $expected = '<div><div name="lev1"><div name="lev2"><div name="0">a</div><div name="1">b</div><div name="2">c</div></div><div name="lev3">text</div></div></div>';
+        $actual = \PMVC\plug($this->_plug)->array()->toHtml($arr, 'div');
+        $this->assertEquals($expected, $actual);
+    }
 }
