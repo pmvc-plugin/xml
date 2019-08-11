@@ -27,7 +27,7 @@ class ArrayConvert
         if (!isset($arr['@props'])) {
             return;
         }
-        if (!is_array($arr['@props'])) {
+        if (!\PMVC\isArray($arr['@props'])) {
             return !trigger_error('Props should be array. '.print_r($arr['@props'], true));
         }
         foreach ($arr['@props'] as $k=>$v) {
@@ -56,12 +56,12 @@ class ArrayConvert
         if (!isset($arr['@children'])) {
             return;
         }
-        if (!is_array($arr['@children'])) {
+        if (!\PMVC\isArray($arr['@children'])) {
             return;
         }
         foreach ($arr['@children'] as $childKey=>$child) {
             $child = $this->_reTag($child, $tag, $childKey);
-            if (!is_array($child)) {
+            if (!\PMVC\isArray($child)) {
                 $this->addChild(
                     $xml,
                     $childKey,
@@ -69,7 +69,7 @@ class ArrayConvert
                 );
                 continue;
             }
-            if (isset($child['@children']) && !is_array($child['@children'])) {
+            if (isset($child['@children']) && !\PMVC\isArray($child['@children'])) {
                 $dom = $this->addChild(
                     $xml,
                     $child['@name'],
@@ -98,7 +98,7 @@ class ArrayConvert
         $oldArr = $arr;
         $oldName = \PMVC\get($arr, '@name', $key);
         if ($oldName !== $tag) {
-          if (!is_array($arr)) {
+          if (!\PMVC\isArray($arr)) {
             $arr = [];
           }
           if (!isset($arr['@children']) && !isset($arr['@name'])) {
@@ -118,7 +118,7 @@ class ArrayConvert
         $dom = new DOMDocument('1.0', 'utf-8');
         $arr = $this->_reTag($arr, $tag);
         if (isset($arr['@children']) &&
-            !is_array($arr['@children'])) 
+            !\PMVC\isArray($arr['@children'])) 
         {
             $root = $dom->createElement(
                 $arr['@name'],

@@ -3,6 +3,7 @@
 namespace PMVC\PlugIn\xml;
 
 use PHPUnit_Framework_TestCase;
+use PMVC\HashMap;
 
 class XmlCovertTest extends PHPUnit_Framework_TestCase
 {
@@ -17,7 +18,7 @@ class XmlCovertTest extends PHPUnit_Framework_TestCase
         $p = \PMVC\plug($this->_plug);
         $xml = $p->xml();
         $actual = $xml->toArray($xmlString);
-        $expected = [
+        $expected = new HashMap([
             '@name'=>'foo',
             '@children'=>[
                 [
@@ -28,8 +29,9 @@ class XmlCovertTest extends PHPUnit_Framework_TestCase
                     ]]
                 ]
             ]
-        ];
+        ], true);
         $this->assertEquals($expected, $actual);
+        $this->assertEquals($xmlString, $p->array()->toXml($actual));
     }
 
     function testHandleColon()
@@ -41,7 +43,7 @@ class XmlCovertTest extends PHPUnit_Framework_TestCase
         $p = \PMVC\plug($this->_plug);
         $xml = $p->xml();
         $actual = $xml->toArray($xmlString);
-        $expected = [
+        $expected = new HashMap([
             '@name'=>'foo',
             '@props'=>[
                 'xmlns:bar'=>'http://xxx'
@@ -55,7 +57,7 @@ class XmlCovertTest extends PHPUnit_Framework_TestCase
                     ]]
                 ]
             ]
-        ];
+        ], true);
         $this->assertEquals($expected, $actual);
     }
 }
