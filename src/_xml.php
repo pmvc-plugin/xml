@@ -4,7 +4,7 @@ namespace PMVC\PlugIn\xml;
 
 ${_INIT_CONFIG}[_CLASS] = __NAMESPACE__.'\XmlConvert';
 
-use PMVC\HashMap;
+use PMVC\HashMapAll;
 
 class XmlConvert
 {
@@ -24,7 +24,7 @@ class XmlConvert
     private function _processProps($obj, $ns=null)
     {
         $props = $obj->attributes($ns, true);
-        $result = new HashMap();
+        $result = [];
         if (empty($ns)) {
             foreach( $props as $k => $v ) { 
                 $k = strtolower(trim($k)); 
@@ -41,7 +41,7 @@ class XmlConvert
 
     private function _processChildren($obj, $ns=null)
     {
-        $result = new HashMap();
+        $result = [];
         $children = $obj->children($ns, true);
         foreach( $children as $k => $v ) { 
             if (count($v)) {
@@ -50,10 +50,10 @@ class XmlConvert
                 if (!empty($ns)) {
                     $k = $ns. ':'. $k;
                 }
-                $result[] = new HashMap([
+                $result[] = [
                     '@name'=> $k,
                     '@children'=> (string)$v
-                ]);
+                ];
             }
         }
         return $result;
@@ -64,8 +64,8 @@ class XmlConvert
         $obj = $this->toObject($xml);
         $namespaces = $obj->getDocNamespaces(true);
         $namespaces[null] = null;
-        $children = new HashMap(); 
-        $props = new HashMap(); 
+        $children = []; 
+        $props = []; 
         $name = strtolower((string)$obj->getName());
         if (!empty($namespace)) {
             $name = $namespace.':'.$name;
@@ -83,7 +83,7 @@ class XmlConvert
                 $this->_processChildren($obj, $ns)
             );
         }
-        $result = new HashMap([ '@name' => $name ]);
+        $result = new HashMapAll([ '@name' => $name ]);
         if (count($props)) {
             $result['@props'] = $props;
         }
